@@ -228,21 +228,28 @@ def render_section(container, title, df_view):
                 .head(top_n)
             )
 
+            # Auto-collapse empty buckets
             if bucket_df.empty:
-                continue  # auto-collapse
+                continue
 
-            st.markdown(f"**{bucket}**")
+            # Bucket header (acts as color context)
+            st.markdown(f"### {bucket}")
 
-            styled = (
-                bucket_df[
-                    ["Company", "Price", "RSI", "Volume", "RSI Signal", "Bucket"]
-                ]
-                .style
-                .apply(style_bucket, axis=1)
-                .hide(axis="index")
+            # FINAL DISPLAY DATAFRAME
+            display_df = bucket_df[[
+                "Company", "Price", "RSI", "Volume", "RSI Signal"
+            ]].copy()
+
+            # 🔢 ROUND VALUES
+            display_df["Price"] = display_df["Price"].round(0).astype(int)
+            display_df["RSI"] = display_df["RSI"].round(0).astype(int)
+            display_df["Volume"] = display_df["Volume"].round(0).astype(int)
+
+            st.dataframe(
+                display_df,
+                use_container_width=True,
+                hide_index=True
             )
-
-            st.dataframe(styled, use_container_width=True)
 
 # =================================================
 # SIDE-BY-SIDE DISPLAY
